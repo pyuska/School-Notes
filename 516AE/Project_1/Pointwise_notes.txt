@@ -1,0 +1,37 @@
+Pointwise Notes
+
+IMPORT
+format for .dat files is:
+
+<number of xyz coordinate triplets in the file>
+x1	y1	z1
+x2	y2	z2
+etc
+
+pointwise recognizes .dat files as 'Segment' files. to import in pointwise, go 
+to File > Import > Database and select your .dat files. it's convenient to split
+your airfoil contour into (at least) upper and lower curves to make it easier to
+customize the grid
+
+import as database; select your database in the List tab and go to Edit > Spline
+to convert it to a smooth spline. this doesn't seem to carry over to the 
+connectors built on top of the database, though.
+
+Q for Dr. Engblom: we split the airfoil into upper and lower segments for grid
+generation; are there other/better ways to divide it up? what about a LE segment
+extending to about halfway along the chord, and an upper and lower curve
+describing the remainder of the airfoil contour? (this would be done to 
+eliminate the sharp artifact at the LE, for example)
+
+When creating domain using Create > Assemble Special > Domain, HAVE to select and 
+save the outer boundary first. Will fail domain generation otherwise.
+
+When creating connectors, can mask databases so you don't accidentally snap to
+them. If 'Show Points' is on for databases, can still accidentally select those 
+points, even if databases themselves are masked off. Possible to hide databases 
+entirely (Ctrl+Shift+F5), just don't forget to turn them back on when you import
+new databases and wonder why they aren't showing up.
+
+There's no way to edit certain aspects of entities after you create them (number
+of nodes on a conncetor, for instance), so make sure you check the default 
+settings before you create something.
