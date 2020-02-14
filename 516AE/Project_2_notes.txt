@@ -1,0 +1,79 @@
+CFD Project 2 (Orbiter L/D) notes
+
+- Just put an unstructured domain on the trailing edge of the orbiter; not 
+  fancy but it works
+- When creating blocks, any orange lines on connectors indicate open surfaces
+  that must be resolved before creating blocks. You should have one at the
+  plane of symmetry in the middle, but nowhere else
+- When resolving shocks, need to give 'breathing room' for shock in your domain
+  around the vehicle. More room for lower freestream Mach. If the shock hits 
+  the boundaries (front/sides), you have to rerun with a larger domain
+- Use 'Recall View +/-<XYZ> to constrain hand-drawn arc to revolve to create 
+  surface of revolution for flow domain to <XYZ> plane?
+- Keep in mind that the max L/D for the shuttle might be at ~40 deg; keep space
+  in your domain for the shuttle model to rotate significantly and still
+  capture the entirety of the flowfield of interest
+- Can impose a pressure outlet condition but Fluent will ignore it (pressure
+  information, and all other information, won't propagate upstream in a
+  supesonic flow)
+- For high enough Mach numbers, numerical errors at the boundary (from 
+  reflecting shocks) won't affect solution at orbiter (the one we're actually 
+  interested in) due to shape of domain of dependence
+- Try to pick a distance downstream for the outlet of your domain such that
+  the flow will return to supersonic flow. Several vehicle lengths seems to
+  be a reasonable length
+- Engblom's domain kinda looks like the Apollo command capsule (BLUNT leading
+  edge!)
+- When drawing database lines to rotate to create domain, can only revolve
+  (Create > Revolve) single line segment at a time. To revolve piecewise curve,
+  have to join the curves together first (Ctrl+J)
+- Change decay factor to affect spacing of grid on domain. (Grid > Domain > 
+  Attributes) Use this to get smooth transition from spacing constraints
+- Have to create/define a closed 3D shell from 2D domains before you can 
+  construct a block. Once a block is constructed, still have to create the 
+  T-rex inside
+- Set the symmetry plane as a 'Match' BC for T-Rex. 'Orbiter' is Wall, far-field
+  is 'Off' (default setting)
+- Select block, then (Grid > Solve > T-Rex > Advanced > Collision Buffer): 0.5 
+  is aggressive, 2 is better. Tells PW how conservative to be when growing grids 
+  that will collide with other grids if growth continues
+- Never run any serious cell-count project off of your P: drive or a flash drive,
+  it will take forever. Save to local desktop and run from there.
+- PW model is 1/30th scale, much easier to scale in Fluent than do full-size in PW
+- Decay factor between 0-1; select domains of interest, then (Grid > Solve > 
+  Attributes > Boundary Decay); 0.5 is default, need to get very close to 1
+  (~ 0.95) for anything noticeable to happen. It seems like a value of 1 
+  preserves connector spacing constraints throughout entire domain
+- For more extreme flows, CFD results are more likely to be compared to other 
+  analytical results, rather than experimental results, due to difficulty in 
+  matching similarity parameters (Re, M) for subscale model tests
+- Not really worth it in this case to spent time up front optimizing grid
+  spacing. Do an initial run, determine where the shock is, use adaptive grid
+  and let Fluent do the work
+- Useful strategy to set different growth rates for different surfaces in T-Rex
+  settings. Growth factor off of the nose of 1.05 might be better (5%), E had 
+  it at 10% at first
+- Fluent Quality check is measure of cell orthogonality
+- FIRST thing to do in FLuent after importing is to go to (General > Scale >
+  X,Y,Z Scaling Fcators > 30 > press Scale ONCE); only have to do this once.
+- Changing air properties: Density : ideal gas, Cp: piecewise polynomial,
+  viscosity: kinetic theory
+- Change atmospheric pressure
+- Flow inlet properties change (45deg AoA, x-comp); match the definitions of 
+  Drag and Lift in report definitions
+- Planform area: go to (Post-Processing > Projected Area > Z, set resolution)
+- First order upwind solution
+- Courant number of 0.1 to start
+- When you first run it, will have a shock immediately on the nose of the 
+  orbiter, set very low Courant number and induce lots of dissipative effects 
+  to calm the solution down
+  
+==============================================================================
+Current progress:
+- Unstructured grids created on surface of orbiter
+
+Next step(s):
+- Create body of revolution and finish 3D shell
+- Apply BCs
+- Set T-Rex settings
+- Create blocks
