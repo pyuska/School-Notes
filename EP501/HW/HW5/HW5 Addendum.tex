@@ -1,0 +1,98 @@
+\documentclass[12pt,letterpaper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage[left=0.75in,right=0.75in,top=0.75in,bottom=0.75in]{geometry}
+\author{Paul Yuska}
+\title{EP501 HW5 Equations}
+\begin{document}
+\maketitle
+
+\section*{Problem 1 Equations}
+Following the method outlined in Section 8.4.1 of the textbook, the general form of the equation we are working with is:
+\begin{equation}
+\bar{y}'' + P(x)\bar{y}' + Q(x)\bar{y} = F(x)\;,
+\end{equation}
+where
+\begin{eqnarray*}
+P(x) &=& \frac{1}{\epsilon}\frac{d\epsilon}{dx}\\
+Q(x) &=& 0\\
+F(x) &=& 0\\
+y &=& \Phi
+\end{eqnarray*}
+Substituting second-order centered difference expressions for the derivatives as given by Equations 8.43 and 8.44 in the textbook and rearranging gives a version of Equation 8.46:
+\begin{equation}
+\label{FDE_P}
+\left(1 - \frac{\Delta x}{2}P_i	\right)\Phi_{i-1} - 2\Phi_i + \left(1 + \frac{\Delta x}{2}P_i	\right)\Phi_{i+1} = 0
+\end{equation}
+$P_i$ can be described by a second-order FDA at the interior points and a first-order FDA at the boundaries. Assuming that the computational grid begins at index 1 at the left boundary and ends at index N at the right boundary,
+\begin{eqnarray*}
+P(x) &=& \frac{\epsilon_{i+1} - \epsilon_{i-1}}{2\epsilon_i \Delta x}\qquad \textnormal{(interior)}\\
+P(x) &=& \frac{\epsilon_{2} - \epsilon_{1}}{\epsilon_1 \Delta x}\qquad \textnormal{(left boundary)}\\
+P(x) &=& \frac{\epsilon_{N} - \epsilon_{N-1}}{\epsilon_N \Delta x}\qquad \textnormal{(right boundary)}
+\end{eqnarray*}
+Substituting the interior $P(x)$ function into (\ref{FDE_P}) gives the FDE for this system:
+\begin{equation}
+\left(1 - \frac{\epsilon_{i+1} - \epsilon_{i-1}}{4\epsilon_i}\right)\Phi_{i-1} - 2\Phi_i + \left(1 + \frac{\epsilon_{i+1} - \epsilon_{i-1}}{4\epsilon_i}	\right)\Phi_{i+1} = 0
+\end{equation}
+%Mixed boundary conditions are of the form of Equation 8.93 in the textbook, repeated here:
+%\begin{equation}
+%\label{mixedBC}
+%A\bar{\Phi}(x_B) + B\bar{\Phi}'(x_B) = C
+%\end{equation}
+%Using second-order approximations as before, (\ref{mixedBC}) can be transformed into
+%\begin{equation}
+%\Phi_{I+1} = \Phi_{I-1} + \frac{2 \Delta x}{B}(C-Ay_I)\;,
+%\end{equation}
+%where $I$ represents an index on the boundary. 
+Given our two initial conditions and the same index numbering scheme, the two resulting FDEs for the boundaries are
+\begin{eqnarray}
+1000 &=& \frac{\Phi_{2} - \Phi_{1}}{\Delta x} \qquad \textnormal{(for $x = -a$)}\\
+100 &=& \Phi_N \qquad \textnormal{(for $x = a$)}
+\end{eqnarray}
+The resulting system of equations, expressed in matrix format, is
+\begin{gather}
+\begin{bmatrix}
+-1 & 1 &   & &  & & &  0 \quad\\
+\alpha & -2 & \beta &  & & & & \\
+ & \alpha & -2 & \beta  & &  & & \\
+ \\
+ & & & & \ddots & & & \\
+ \\
+& & & & & \alpha& -2& \beta \quad\\
+0 & & & & & & & 1 \quad
+\end{bmatrix}
+\begin{bmatrix}
+\Phi_1\\
+\Phi_2\\
+\Phi_3\\
+\\
+\vdots \\
+\\
+\Phi_{N-1}\\
+\Phi_{N}
+\end{bmatrix}
+=
+\begin{bmatrix}
+1000 \Delta x\\
+0\\
+0\\
+\\
+\vdots \\
+\\
+0\\
+100
+\end{bmatrix}
+\end{gather}
+where blank elements are zero, and $\alpha$ and $\beta$ are given by
+\begin{eqnarray*}
+\alpha &=& 1 - \frac{\epsilon_{i+1} - \epsilon_{i-1}}{4\epsilon_i}\\
+\beta &=& 1 + \frac{\epsilon_{i+1} - \epsilon_{i-1}}{4\epsilon_i}
+\end{eqnarray*}
+Since the dielectric function varies rapidly at the edges, the derivative of $\Phi$ can be better approximated by a second-order FDA at $x = -a$:
+\begin{equation}
+\frac{d \Phi(-a)}{dx} = \frac{-\Phi_{3} + 4\Phi_{2} - 3\Phi_1}{2\Delta x}
+\end{equation}
+\end{document}

@@ -1,0 +1,678 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>matlab_basics</title><meta name="generator" content="MATLAB 9.5"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2019-08-29"><meta name="DC.source" content="matlab_basics.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#2">Things illustrated during class</a></li><li><a href="#3">Create some 1D and 2D data for plotting</a></li><li><a href="#4">Plot various data</a></li><li><a href="#5">Print the plots to files that can be embedded in word processors</a></li><li><a href="#6">Set up, evaluation, and solution of linear systems of equations.  Manipulation of matrices.</a></li><li><a href="#7">Special functions, illustration of using greek letters in strings</a></li><li><a href="#8">Demonstration of precision issues in matlab and formatted print statements (avoid subtracting number of vastly different magnitudes...)</a></li></ul></div><pre class="codeinput"><span class="comment">% The purpose of this program is to illustrate examples of a wide swath of</span>
+<span class="comment">% common Matlab use cases, most of which will be useful at some point in the</span>
+<span class="comment">% semester.</span>
+<span class="comment">%</span>
+<span class="comment">%This script requires files containing the functions fun1D and fun2D.</span>
+</pre><h2 id="2">Things illustrated during class</h2><pre class="codeinput"><span class="comment">% installing matlab</span>
+<span class="comment">% arrays, vector operations, etc.</span>
+<span class="comment">% complex number manipulation, abs, angle, real, imaginary</span>
+<span class="comment">% random number generation:  rand, randn, histograms</span>
+<span class="comment">% publishing matlab content</span>
+</pre><h2 id="3">Create some 1D and 2D data for plotting</h2><p>independent coordinates</p><pre class="codeinput">x=linspace(-10,10,100);    <span class="comment">%100-point arrays for x and y</span>
+y=linspace(-10,10,100);
+[X,Y]=meshgrid(x,y);       <span class="comment">%2D function evaluations require true 2D grid of points</span>
+
+<span class="comment">% function evaluations</span>
+y1=fun1D(x,1,1,3);
+y2=fun1D(x,1.5,-1,2);
+Z1=fun2D(X,Y,2,0,0,3,4);
+Z2=fun2D(X,Y,5,2,-2,2,2);
+</pre><h2 id="4">Plot various data</h2><p>1D data</p><pre class="codeinput">figure(1);
+clf;                        <span class="comment">%clear out the old figure (if applicable)</span>
+plot(x,y1,<span class="string">'-'</span>,x,y2,<span class="string">'--'</span>);
+grid <span class="string">on</span>;                    <span class="comment">%add a grid</span>
+xlabel(<span class="string">'x (arb. units)'</span>);
+ylabel(<span class="string">'y (arb. units)'</span>);
+title(<span class="string">'Plot of two different 1D functions'</span>)
+legend(<span class="string">'y_1(x)'</span>,<span class="string">'y_2(x)'</span>)
+
+<span class="comment">% 2D data</span>
+figure(2);
+clf;
+
+ax1=subplot(1,2,1);
+imagesc(x,y,Z1);                        <span class="comment">%scaled image plots (recommended for 2D plots)</span>
+axis <span class="string">xy</span>;                                <span class="comment">%rearrange plot with a non-inverted x-y axis</span>
+xlabel(<span class="string">'x (arb. units)'</span>);
+ylabel(<span class="string">'y (arb. units)'</span>);
+c=colorbar;                             <span class="comment">%save colorbar handle so you can add labels to it</span>
+ylabel(c,<span class="string">'z_1 value (arb.)'</span>);
+
+ax2=subplot(1,2,2);
+imagesc(x,y,Z2);
+axis <span class="string">xy</span>;
+xlabel(<span class="string">'x (arb. units)'</span>);
+ylabel(<span class="string">'y (arb. units)'</span>);
+c=colorbar;
+colormap(ax2,jet(256));                 <span class="comment">%switch colormap to jet and use 256 different shades (default is usually 64) - only do this for the second set of axes in the figure</span>
+ylabel(c,<span class="string">'z_2 value (arb.)'</span>);
+
+<span class="comment">% Logarithmic plotting example</span>
+figure(3);
+clf;
+
+<span class="comment">% semilog plot</span>
+subplot(1,2,1);
+semilogy(x,y1,<span class="string">'-'</span>,x,y2,<span class="string">'--'</span>);
+xlabel(<span class="string">'x (arb. units)'</span>);
+ylabel(<span class="string">'y (arb. units)'</span>);
+title(<span class="string">'Semi-log plot of 1D functions'</span>)
+legend(<span class="string">'y_1(x)'</span>,<span class="string">'y_2(x)'</span>)
+
+<span class="comment">%log-log plot</span>
+subplot(1,2,2);
+inds=find(x&gt;0);                         <span class="comment">%find indices where x&gt;0</span>
+loglog(x(inds),y1(inds),<span class="string">'-'</span>,x(inds),y2(inds),<span class="string">'--'</span>);
+xlabel(<span class="string">'x (arb. units)'</span>);
+ylabel(<span class="string">'y (arb. units)'</span>);
+legend(<span class="string">'y_1(x)'</span>,<span class="string">'y_2(x)'</span>)
+</pre><img vspace="5" hspace="5" src="matlab_basics_01.png" alt=""> <img vspace="5" hspace="5" src="matlab_basics_02.png" alt=""> <img vspace="5" hspace="5" src="matlab_basics_03.png" alt=""> <h2 id="5">Print the plots to files that can be embedded in word processors</h2><pre class="codeinput">figure(1);
+print(<span class="string">'-depsc2'</span>,<span class="string">'fig1.eps'</span>);            <span class="comment">%print to postscript (vector graphics)</span>
+figure(2);
+print(<span class="string">'-dpng'</span>,<span class="string">'fig2.png'</span>);              <span class="comment">%png file (rasterized)</span>
+figure(3);
+set(gcf,<span class="string">'PaperPosition'</span>,[0 0 11 5]);    <span class="comment">%adjust the aspect ratio of the printed figure to fit on 11x5 "sheet of paper" (prevents figure squeezing)</span>
+print(<span class="string">'-depsc2'</span>,<span class="string">'fig3.eps'</span>);
+</pre><img vspace="5" hspace="5" src="matlab_basics_04.png" alt=""> <img vspace="5" hspace="5" src="matlab_basics_05.png" alt=""> <img vspace="5" hspace="5" src="matlab_basics_06.png" alt=""> <h2 id="6">Set up, evaluation, and solution of linear systems of equations.  Manipulation of matrices.</h2><pre class="codeinput"><span class="comment">% this matrix and vector represent the system of equations:</span>
+<span class="comment">% 1)   x +  2y +  4z = 18</span>
+<span class="comment">% 2)  2x + 12y -  2z =  9</span>
+<span class="comment">% 3)  5x + 26y +  5z = 14</span>
+A=[1,  2, 4; <span class="keyword">...</span><span class="comment">    %notice that the ellipses in matlab allows you to continue a line</span>
+   2, 12,-2; <span class="keyword">...</span>
+   5, 26, 5];       <span class="comment">%A(i,j) is the coefficient of the ith variable in the jth equation</span>
+B=A';               <span class="comment">%transpose of A</span>
+
+b=[18; 9; 14];      <span class="comment">%this is the column vector representing the RHS of the system</span>
+
+<span class="comment">% Some basic commands to display variables</span>
+disp(<span class="string">'A = '</span>);
+disp(A);
+
+disp(<span class="string">'b = '</span>);
+disp(b);
+
+<span class="comment">% Compute some matrix properties and print them</span>
+disp(<span class="string">'det(A) = '</span>);
+disp(det(A));
+
+disp(<span class="string">'trace(A) = '</span>);
+disp(trace(A));
+
+disp(<span class="string">'condition # of A = '</span>);
+disp(cond(A));
+
+disp(<span class="string">'transpose(A) = '</span>);
+disp(B);
+
+disp(<span class="string">'Aii (diagonal elements of A) = '</span>);
+disp(diag(A));
+
+<span class="comment">%matrix functions</span>
+disp(<span class="string">'A*B (matrix multiplication) = '</span>);
+disp(A*B);
+
+disp(<span class="string">'Aij*Bij (scalar multiplication) = '</span>);
+disp(A.*B);
+
+disp(<span class="string">'5*A (multiplication) = '</span>);
+disp(5*A);
+
+disp(<span class="string">'Solution (x) of the system A*x=b:  '</span>);
+disp(<span class="string">'x = '</span>);
+xvec=A\b;
+disp(xvec);
+
+disp(<span class="string">'I (3x3 identity matrix) = '</span>);
+disp(eye(3));
+
+disp(<span class="string">'A^{-1} (inverse of A) = '</span>)
+disp(A\eye(3));                    <span class="comment">%this is preferred over inv(A) (see matlab documentation)</span>
+
+<span class="comment">%slicing and concatenation of array/matrices</span>
+disp(<span class="string">'2nd row of A = '</span>);
+disp(A(2,:));
+
+disp(<span class="string">'2nd column of A = '</span>);
+disp(A(:,2));
+
+disp(<span class="string">'flat list (column vector) of matrix elements of A:  '</span>)
+disp(A(:));
+
+disp(<span class="string">'[A|A] (horizontal concatenation of A with itself):  '</span>)
+disp(cat(2,A,A));
+
+disp(<span class="string">'Vertical concatenation of A with itself:  '</span>)
+disp(cat(1,A,A));
+
+disp(<span class="string">'diagonal matrix:  '</span>);
+a1=10:-1:1;                        <span class="comment">%count backward</span>
+a1=a1(:);                          <span class="comment">%convert to column vector</span>
+disp(diag(a1,0));
+
+disp(<span class="string">'LU decomposition of A (A=L*U):  '</span>)
+[L,U]=lu(A);
+disp(<span class="string">'L = '</span>);
+disp(L);
+disp(<span class="string">'U = '</span>);
+disp(U);
+
+disp(<span class="string">'Eigenvalues of A = '</span>);
+[psi,lambda]=eig(A);
+disp(lambda);
+disp(<span class="string">'Eigenvectors of A = '</span>);
+disp(psi(:,1));
+disp(psi(:,2));
+disp(psi(:,3));
+</pre><pre class="codeoutput">A = 
+     1     2     4
+     2    12    -2
+     5    26     5
+
+b = 
+    18
+     9
+    14
+
+det(A) = 
+   40.0000
+
+trace(A) = 
+    18
+
+condition # of A = 
+  116.9115
+
+transpose(A) = 
+     1     2     5
+     2    12    26
+     4    -2     5
+
+Aii (diagonal elements of A) = 
+     1
+    12
+     5
+
+A*B (matrix multiplication) = 
+    21    18    77
+    18   152   312
+    77   312   726
+
+Aij*Bij (scalar multiplication) = 
+     1     4    20
+     4   144   -52
+    20   -52    25
+
+5*A (multiplication) = 
+     5    10    20
+    10    60   -10
+    25   130    25
+
+Solution (x) of the system A*x=b:  
+x = 
+   53.3500
+   -8.8750
+   -4.4000
+
+I (3x3 identity matrix) = 
+     1     0     0
+     0     1     0
+     0     0     1
+
+A^{-1} (inverse of A) = 
+    2.8000    2.3500   -1.3000
+   -0.5000   -0.3750    0.2500
+   -0.2000   -0.4000    0.2000
+
+2nd row of A = 
+     2    12    -2
+
+2nd column of A = 
+     2
+    12
+    26
+
+flat list (column vector) of matrix elements of A:  
+     1
+     2
+     5
+     2
+    12
+    26
+     4
+    -2
+     5
+
+[A|A] (horizontal concatenation of A with itself):  
+     1     2     4     1     2     4
+     2    12    -2     2    12    -2
+     5    26     5     5    26     5
+
+Vertical concatenation of A with itself:  
+     1     2     4
+     2    12    -2
+     5    26     5
+     1     2     4
+     2    12    -2
+     5    26     5
+
+diagonal matrix:  
+    10     0     0     0     0     0     0     0     0     0
+     0     9     0     0     0     0     0     0     0     0
+     0     0     8     0     0     0     0     0     0     0
+     0     0     0     7     0     0     0     0     0     0
+     0     0     0     0     6     0     0     0     0     0
+     0     0     0     0     0     5     0     0     0     0
+     0     0     0     0     0     0     4     0     0     0
+     0     0     0     0     0     0     0     3     0     0
+     0     0     0     0     0     0     0     0     2     0
+     0     0     0     0     0     0     0     0     0     1
+
+LU decomposition of A (A=L*U):  
+L = 
+    0.2000    1.0000         0
+    0.4000   -0.5000    1.0000
+    1.0000         0         0
+
+U = 
+    5.0000   26.0000    5.0000
+         0   -3.2000    3.0000
+         0         0   -2.5000
+
+Eigenvalues of A = 
+   0.4090 + 0.0000i   0.0000 + 0.0000i   0.0000 + 0.0000i
+   0.0000 + 0.0000i   8.7955 + 4.5216i   0.0000 + 0.0000i
+   0.0000 + 0.0000i   0.0000 + 0.0000i   8.7955 - 4.5216i
+
+Eigenvectors of A = 
+   -0.9823
+    0.1791
+    0.0556
+
+   0.3740 - 0.1688i
+   0.0581 + 0.1874i
+   0.8906 + 0.0000i
+
+   0.3740 + 0.1688i
+   0.0581 - 0.1874i
+   0.8906 + 0.0000i
+
+</pre><h2 id="7">Special functions, illustration of using greek letters in strings</h2><pre class="codeinput">t=linspace(-3,3,100);          <span class="comment">%indep variable for gamma and erf</span>
+rho=linspace(0,10,100);        <span class="comment">%radial independent variable</span>
+costh=linspace(-1,1,100);      <span class="comment">%cos(theta) variable</span>
+
+figure(4);
+
+subplot(2,2,1);
+plot(t,gamma(t));              <span class="comment">%gamma function</span>
+xlabel(<span class="string">'t'</span>);
+ylabel(<span class="string">'\Gamma (t)'</span>);
+
+subplot(2,2,2);
+plot(t,erf(t));                <span class="comment">%error function</span>
+xlabel(<span class="string">'t'</span>);
+ylabel(<span class="string">'erf(t)'</span>);
+
+subplot(2,2,3);
+plot(rho,besselj(0,rho),rho,besselj(1,rho),rho,besselj(2,rho),rho,besselj(3,rho))   <span class="comment">%first arg to bessel function is order, second is indep variable</span>
+xlabel(<span class="string">'\rho'</span>);
+ylabel(<span class="string">'J_\nu(\rho)'</span>);
+
+<span class="comment">%associated legendre function</span>
+P0=legendre(0,costh);
+P1data=legendre(1,costh);
+P1=P1data(1,:);                <span class="comment">%pick the m=0 associated legendre function which is an ordinatry legendre polynomial</span>
+P2data=legendre(2,costh);
+P2=P2data(1,:);
+P3data=legendre(3,costh);
+P3=P3data(3,:);
+subplot(2,2,4);
+plot(costh,P0,costh,P1,costh,P2,costh,P3);
+xlabel(<span class="string">'cos \theta'</span>);
+ylabel(<span class="string">'P_n (cos \theta)'</span>);
+</pre><img vspace="5" hspace="5" src="matlab_basics_07.png" alt=""> <h2 id="8">Demonstration of precision issues in matlab and formatted print statements (avoid subtracting number of vastly different magnitudes...)</h2><pre class="codeinput">epssingle=eps(single(1.0));      <span class="comment">%single precision smallest interval from number 1.0</span>
+
+disp(<span class="string">'1 (single precision):  '</span>)
+fprintf(<span class="string">'%32.31f \n'</span>,single(1.0));
+disp(<span class="string">'1+eps (single precision):  '</span>);
+fprintf(<span class="string">'%32.31f \n'</span>,single(1.0)+epssingle);
+disp(<span class="string">'1+eps/2 (single precision):  '</span>);
+fprintf(<span class="string">'%32.31f \n\n'</span>,single(1.0)+epssingle/2);
+
+disp(<span class="string">'1 (double precision):  '</span>)
+fprintf(<span class="string">'%32.31f \n'</span>,double(1.0));
+disp(<span class="string">'1+double(eps) (single precision eps):  '</span>);
+fprintf(<span class="string">'%32.31f \n'</span>,double(1.0)+double(epssingle));
+disp(<span class="string">'1+double(eps)/2.0 (single precision eps):  '</span>);
+fprintf(<span class="string">'%32.31f \n'</span>,double(1.0)+double(epssingle)/2);
+</pre><pre class="codeoutput">1 (single precision):  
+1.0000000000000000000000000000000 
+1+eps (single precision):  
+1.0000001192092895507812500000000 
+1+eps/2 (single precision):  
+1.0000000000000000000000000000000 
+
+1 (double precision):  
+1.0000000000000000000000000000000 
+1+double(eps) (single precision eps):  
+1.0000001192092895507812500000000 
+1+double(eps)/2.0 (single precision eps):  
+1.0000000596046447753906250000000 
+</pre><p class="footer"><br><a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2018b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+% The purpose of this program is to illustrate examples of a wide swath of 
+% common Matlab use cases, most of which will be useful at some point in the
+% semester.  
+%
+%This script requires files containing the functions fun1D and fun2D.  
+
+
+
+%% Things illustrated during class
+
+% installing matlab
+% arrays, vector operations, etc.
+% complex number manipulation, abs, angle, real, imaginary
+% random number generation:  rand, randn, histograms
+% publishing matlab content
+
+
+
+%% Create some 1D and 2D data for plotting
+% independent coordinates
+x=linspace(-10,10,100);    %100-point arrays for x and y
+y=linspace(-10,10,100);
+[X,Y]=meshgrid(x,y);       %2D function evaluations require true 2D grid of points
+
+% function evaluations
+y1=fun1D(x,1,1,3);
+y2=fun1D(x,1.5,-1,2);
+Z1=fun2D(X,Y,2,0,0,3,4);
+Z2=fun2D(X,Y,5,2,-2,2,2);
+
+
+
+%% Plot various data
+% 1D data
+figure(1);
+clf;                        %clear out the old figure (if applicable)
+plot(x,y1,'-',x,y2,'REPLACE_WITH_DASH_DASH');
+grid on;                    %add a grid
+xlabel('x (arb. units)');
+ylabel('y (arb. units)');
+title('Plot of two different 1D functions')
+legend('y_1(x)','y_2(x)')
+
+% 2D data
+figure(2);
+clf;
+
+ax1=subplot(1,2,1);
+imagesc(x,y,Z1);                        %scaled image plots (recommended for 2D plots)
+axis xy;                                %rearrange plot with a non-inverted x-y axis
+xlabel('x (arb. units)');
+ylabel('y (arb. units)');
+c=colorbar;                             %save colorbar handle so you can add labels to it
+ylabel(c,'z_1 value (arb.)');
+
+ax2=subplot(1,2,2);
+imagesc(x,y,Z2);
+axis xy;
+xlabel('x (arb. units)');
+ylabel('y (arb. units)');
+c=colorbar;
+colormap(ax2,jet(256));                 %switch colormap to jet and use 256 different shades (default is usually 64) - only do this for the second set of axes in the figure
+ylabel(c,'z_2 value (arb.)');
+
+% Logarithmic plotting example
+figure(3);
+clf;
+
+% semilog plot
+subplot(1,2,1);
+semilogy(x,y1,'-',x,y2,'REPLACE_WITH_DASH_DASH');
+xlabel('x (arb. units)');
+ylabel('y (arb. units)');
+title('Semi-log plot of 1D functions')
+legend('y_1(x)','y_2(x)')
+
+%log-log plot
+subplot(1,2,2);
+inds=find(x>0);                         %find indices where x>0
+loglog(x(inds),y1(inds),'-',x(inds),y2(inds),'REPLACE_WITH_DASH_DASH');
+xlabel('x (arb. units)');
+ylabel('y (arb. units)');
+legend('y_1(x)','y_2(x)')
+
+
+
+%% Print the plots to files that can be embedded in word processors
+figure(1);
+print('-depsc2','fig1.eps');            %print to postscript (vector graphics)
+figure(2);
+print('-dpng','fig2.png');              %png file (rasterized)
+figure(3);
+set(gcf,'PaperPosition',[0 0 11 5]);    %adjust the aspect ratio of the printed figure to fit on 11x5 "sheet of paper" (prevents figure squeezing)
+print('-depsc2','fig3.eps');
+
+
+
+%% Set up, evaluation, and solution of linear systems of equations.  Manipulation of matrices.
+
+% this matrix and vector represent the system of equations:
+% 1)   x +  2y +  4z = 18
+% 2)  2x + 12y -  2z =  9
+% 3)  5x + 26y +  5z = 14
+A=[1,  2, 4; ...    %notice that the ellipses in matlab allows you to continue a line
+   2, 12,-2; ...
+   5, 26, 5];       %A(i,j) is the coefficient of the ith variable in the jth equation
+B=A';               %transpose of A
+
+b=[18; 9; 14];      %this is the column vector representing the RHS of the system
+
+% Some basic commands to display variables
+disp('A = ');
+disp(A);
+
+disp('b = ');
+disp(b);
+
+% Compute some matrix properties and print them
+disp('det(A) = ');
+disp(det(A));
+
+disp('trace(A) = ');
+disp(trace(A));
+
+disp('condition # of A = ');
+disp(cond(A));
+
+disp('transpose(A) = ');
+disp(B);
+
+disp('Aii (diagonal elements of A) = ');
+disp(diag(A));
+
+%matrix functions
+disp('A*B (matrix multiplication) = ');
+disp(A*B);
+
+disp('Aij*Bij (scalar multiplication) = ');
+disp(A.*B);
+
+disp('5*A (multiplication) = ');
+disp(5*A);
+
+disp('Solution (x) of the system A*x=b:  ');
+disp('x = ');
+xvec=A\b;
+disp(xvec);
+
+disp('I (3x3 identity matrix) = ');
+disp(eye(3));
+
+disp('A^{-1} (inverse of A) = ')
+disp(A\eye(3));                    %this is preferred over inv(A) (see matlab documentation)
+
+%slicing and concatenation of array/matrices
+disp('2nd row of A = ');
+disp(A(2,:));
+
+disp('2nd column of A = ');
+disp(A(:,2));
+
+disp('flat list (column vector) of matrix elements of A:  ')
+disp(A(:));
+
+disp('[A|A] (horizontal concatenation of A with itself):  ')
+disp(cat(2,A,A));
+
+disp('Vertical concatenation of A with itself:  ')
+disp(cat(1,A,A));
+
+disp('diagonal matrix:  ');
+a1=10:-1:1;                        %count backward
+a1=a1(:);                          %convert to column vector
+disp(diag(a1,0));
+
+disp('LU decomposition of A (A=L*U):  ')
+[L,U]=lu(A);
+disp('L = ');
+disp(L);
+disp('U = ');
+disp(U);
+
+disp('Eigenvalues of A = ');
+[psi,lambda]=eig(A);
+disp(lambda);
+disp('Eigenvectors of A = ');
+disp(psi(:,1));
+disp(psi(:,2));
+disp(psi(:,3));
+
+
+
+%% Special functions, illustration of using greek letters in strings
+t=linspace(-3,3,100);          %indep variable for gamma and erf
+rho=linspace(0,10,100);        %radial independent variable
+costh=linspace(-1,1,100);      %cos(theta) variable
+
+figure(4);
+
+subplot(2,2,1);
+plot(t,gamma(t));              %gamma function
+xlabel('t');
+ylabel('\Gamma (t)');
+
+subplot(2,2,2);
+plot(t,erf(t));                %error function
+xlabel('t');
+ylabel('erf(t)');
+
+subplot(2,2,3);
+plot(rho,besselj(0,rho),rho,besselj(1,rho),rho,besselj(2,rho),rho,besselj(3,rho))   %first arg to bessel function is order, second is indep variable
+xlabel('\rho');
+ylabel('J_\nu(\rho)');
+
+%associated legendre function
+P0=legendre(0,costh);
+P1data=legendre(1,costh);
+P1=P1data(1,:);                %pick the m=0 associated legendre function which is an ordinatry legendre polynomial
+P2data=legendre(2,costh);
+P2=P2data(1,:);
+P3data=legendre(3,costh);
+P3=P3data(3,:);
+subplot(2,2,4);
+plot(costh,P0,costh,P1,costh,P2,costh,P3);
+xlabel('cos \theta');
+ylabel('P_n (cos \theta)');
+
+
+
+%% Demonstration of precision issues in matlab and formatted print statements (avoid subtracting number of vastly different magnitudes...)
+
+epssingle=eps(single(1.0));      %single precision smallest interval from number 1.0
+
+disp('1 (single precision):  ')
+fprintf('%32.31f \n',single(1.0));
+disp('1+eps (single precision):  ');
+fprintf('%32.31f \n',single(1.0)+epssingle);
+disp('1+eps/2 (single precision):  ');
+fprintf('%32.31f \n\n',single(1.0)+epssingle/2);
+
+disp('1 (double precision):  ')
+fprintf('%32.31f \n',double(1.0));
+disp('1+double(eps) (single precision eps):  ');
+fprintf('%32.31f \n',double(1.0)+double(epssingle));
+disp('1+double(eps)/2.0 (single precision eps):  ');
+fprintf('%32.31f \n',double(1.0)+double(epssingle)/2);
+
+##### SOURCE END #####
+--></body></html>

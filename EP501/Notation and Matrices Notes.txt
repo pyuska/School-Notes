@@ -1,0 +1,221 @@
+EP501 MATRICES AND NOTATION ==================================================
+
+A single bar underneath a variable indicates that it is a vector, column unless
+otherwise specified.
+
+A double bar underneath a variable indicates that it is a matrix (of arbitrary 
+dimensions). Three bars is a 3rd-rank tensor, etc.
+
+Matrices must be conformable (rows and columns match up correctly) to multiply 
+them.
+
+When modeling a physical system, you should always end up with a system of 
+equations that has a solution; otherwise you messed something up. That being 
+said:
+
+Mathematically speaking, there are several possibilities concerning solutions:
+- no solution (inconsistency, you made a mistake)
+- trivial solution (x = 0)
+- infinite solutions (semi-common, but there is often only one solution that 
+  satisfies the particular set of boundary conditions for the problem)
+- unique solution (most common)
+
+Tensors we will encounter:
+- column vector
+- row vector
+- square matrix
+- diagonal matrices (only the diagonal is non-zero)
+- identity matrix (denoted as I)
+- upper triangular / lower triangular matrices (only upper/lower triangle is 
+  non-zero; diagonal is always non-zero)
+- banded matrices (a diagonal matrix with super- and sub-diagonals (bands) 
+  above and below the main diagonal, respectively; typically, everything else 
+  is zero; very important for ODE solutions)
+
+Matrix addition/subtraction is element-by-element.
+Matrices multiplied by a scalar is element-by-element multiplication.
+
+Matrices have the associative property (A(B+C) = AB + AC), but they do NOT have
+commutivity (AB != BA)
+
+Matrix inverse (AA^-1 = I). This operation DOES commute. Not all matrices have 
+inverses. However, (AB^-1 = B^-1 A^-1), and (AB^T = B^T A^T) (pay attention to
+ordering!!)
+
+Matrix division is not defined. Use matrix inverses instead. But sometimes 
+calculating A^-1 is expensive/complicated, and there are better/faster 
+solutions.
+
+Matrix determinant is sometimes denoted as |A|, when the vertical bars are 
+usually reserved for vector magnitudes, and the determinant is a kind of matrix
+"magnitude". Imagine that the rows of a 3x3 matrix A are a_1, a_2, a_3, b_1, 
+b_2, etc. It turns out that the determinant of A is a•bxc (a dot b cross c, a 
+triple product). These can be represented in 3D space as 3 (non-coplanar) 
+vectors. If those vectors are turned into a parallelpiped, the volume of that 
+parallelpiped is equal to a•bxc, or the determinant of A (|A|). If a lies in 
+the plane of b and c, the parallelpiped has no volume, and |A| is also zero. 
+Interestingly, if the volume of the parallelpiped goes to zero, then either the
+dot product or the cross product is zero, which implies that the vectors are 
+coplanar (cross product) or collinear (dot product), which means in linear 
+algebra terms that the equations that the vectors represent are not linearly 
+independent.
+
+Definition of determinant:
+
+det(A) = sum from j=1 to n (n is number of unknowns in system, or A is nxn 
+matrix) of A_ij multiplied by the cofactor of A_ij
+
+Definition of cofactor:
+(-1)^(i+j)*M_ij (the minor of ij)
+
+Definition of minor of A_23:
+cross out the corresponding row (2) and column (3)
+| A_11 A_12 A_13 |      | A_11 A_12 |
+| A_21 A_22 A_23 | ->   | A_31 A_32 | -> (A_11*A_32) - (A_12*A_31) = M_23
+| A_31 A_32 A_33 |
+you calculate the minors when doing cross products
+
+When calculating determinants of matrices, have to calculate determinants of 
+minors, which may have minors of their own, etc.
+
+The number of terms for a cofactor expansion of a determinant is n! (which is 
+VERY computationally expensive), but it gets worse. Each term is itself (n-1) 
+multiplies, which are also mildly expensive operations, so the cofactor 
+expansion method is bigO(n!(n-1)).
+
+Direct solution method (of which Cramer's Rule is one) is a solution method 
+that involves direct evaluation of the determinants (which is something to 
+avoid if possible)
+
+Cramer's Rule goes as bigO((n-1)(n+1)!)
+
+Elimination Methods:
+3 allowed elementary row operations to perform on a modified matrix ("modified"
+matrix is b from Ax = b horizontally appended to the right side of A)
+E1) Multiply any row by a scalar
+E2) Interchange rows ("pivoting"), important for avoiding numerical errors
+E3) Any two rows may be linearly combined (R1 - 0.5R2, etc.)
+
+Can perform elementary row operations unlimited times without changing solution.
+Row operations can be expressed as matrix multiplications. Pre-multiplying A by 
+E1 (E1*A) is equivalent to multiplying the first row of A by c.
+
+     | c 0 0 |                   | 1 0 0 |
+E1 = | 0 1 0 |      OR      E1 = | 0 c 0 |      etc.
+     | 0 0 1 |                   | 0 0 1 |
+
+     | 0 1 0 |
+E2 = | 1 0 0 |      swaps rows 1 and 2
+     | 0 0 1 |
+
+     | 1 0 0 |
+E3 = | 0 1 0 |      adds (row1)*c to row 3
+     | c 0 1 |
+
+When performing an elimination step, the element used to eliminate a 
+corresponding element in a different equation is given a specific name: the 
+"pivot element"
+
+Solution methods:
+- Forward elimination (goal is to produce an upper triangular matrix 'U')
+- Back substitution (happens after U is found using forward elimination)
+
+Only evenly-determined systems (same number of equations as unknowns) have 
+unique solutions. Over- and under-determined systems have either no solution or
+non-unique solutions.
+
+There is a metric to quantify whether precision errors will be an issue with 
+your matrix, called the "condition number". MATLAB has a built-in 
+'cond(<your matrix>)'. A result of 15 isn't bad, but a result of 10^6 is bad.
+
+Two additional operations beyond standard elimination are needed in practice:
+- Pivoting (the act of swapping rows; different from the pivot element)
+    - Generally want your pivot element to be large with respect to the rest of
+      your system; due to the way machine representation of numbers works, 
+      dividing by a large number to get a small number is more accurate than 
+      dividing by a small number to get a large number.
+- Scaling (self-explanatory)
+    - When determining which element to use as pivot element, scale each row by
+      the largest value (divide through by that value; usually the forcing term
+      on the right), then pick the largest result as the pivot element.
+
+"Scaling and pivoting" refers to this process of picking the proper pivot 
+element by dividing through each row by the largest value in that row and 
+comparing rows to pick the row with the largest result. Scaling and pivoting 
+isn't used in the actual elimination process, it's only used to pick an optimal
+pivot element.
+
+You have to recompute the optimal pivot element with EVERY elimination step.
+
+Gaussian elimination is a particular form of simple elimination which 
+incorporates pivoting and scaling to reduce numerical accuracy errors.
+
+There is an extension of Gaussian Elimination called Gauss-Jordan Elimination.
+It's a way of computing a matrix inverse that is computationally cheaper than 
+direct methods. The goal is to produce an identity matrix. When eliminating, 
+instead of only eliminating downwards, also eliminate upwards to create 
+identity matrix.
+
+CONDITIONING
+
+Elimination methods are sensitive to roundoff errors. One way to quantify this 
+sensitivity is the 'conditioning' of the matrix, or the matrix condition number
+(cond() function in MATLAB). The condition number is based on the idea of the 
+norm, which is a measure of magnitude that satisfies the following conditions:
+
+||A|| ≥ 0 (only zero if all elements are zero)
+
+||αA|| = |α| ||A||
+
+||AB|| ≤ ||A|| ||B|| (Schwarz Inequality)
+
+Commonly used vector norms
+- L1 norm: ||x1|| = sum_i |x_i|
+- L2 norm:
+- L∞ norm:
+
+Commonly used matrix norms
+- 1
+- ∞
+- 2
+- e (Euclidean)
+
+If Condition Number is on the order of ~1, that's a good value (10 is fine, 100
+is fine, 1x10^8 is not). Very small condition number can also be bad.
+
+Iterative methods are less sensitive to noise, but require certain conditions 
+to work well. Matrices must be diagonally dominant (diagonal elements are large
+compared to other elements). Diagonal dominance is actually a stringent 
+requirement, excluding a lot of systems, except for finite difference systems, 
+which are almost always diagonally dominant.
+
+Iterative methods are useful for "large systems" (definition of large has 
+changed over the past 5 years/decade), currently 10^5 to 10^6 unknowns. Special
+systems can be solved directly up to about 10^5, but may take time 
+(~1min/iteration).
+
+Useful terms for iterative methods
+- Residual: a measure of error.
+
+Doolittle LU Factorization:
+- like numbers, matrices can be factored into products of other matrices in 
+  infinite ways
+- a special form of this is when the two product matrices are lower and 
+  upper diagonal, respectively: A = LU
+- there are infinite ways to factor A, so the solution is made unique by 
+  specifying the  major diagonal elements of L or U.
+- specifying the major diagonal elements of L to be unity -> Doolittle method
+- specifying the major diagonal elements of U to be unity -> Crout method
+
+Ax = b -> LUx = b -> (L^-1)LUx = IUx = Ux = (L^-1)b
+
+result: Ux = (L^-1)b
+
+define b' as b' = (L^-1)b, then Lb' = L(L^-1)b = Ib = b
+
+U matrix is the matrix acquired by elimination methods (Gauss or otherwise). L 
+is the matrix that contains 1 on the main diagonal and the elimination 
+multipliers used to transform A into U. These are the terms in parentheses 
+being multiplied by the pivot row in row elimination steps.
+
+The main benefit of LU factorization is that it reduces the computations required for multiple RHS vectors.

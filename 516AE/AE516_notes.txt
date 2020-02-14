@@ -1,0 +1,56 @@
+y+ is a non-dimensional representation of distance off of a wall
+u* is shear-stress-related; think of it as "frictional velocity"
+
+u+ = u*/u, where u is actual velocity
+y+ = y(u*/nu), where nu is kinematic viscosity
+
+all CFD codes assume that you've made the grid properly to resolve a laminar sublayer
+
+every turbulent boundary layer is laminar close to the wall. this laminar region is maybe microns thick, but eddies cannot survive in this small region.
+
+"grid-to-the-wall" means your first cell is within the laminar (viscous) region. having a "wall function" means that your first cell is in the overlap layer (see graph in notes)
+
+Fluent will try to determine if your grid is fine enough to implement a "grid-to-the-wall" approach, so will override your settings if it determines that your grid isn't fine enough and applies 
+a wall function instead.
+
+Grid generation is an art form. There is no one right answer. A high-quality grid has 3 properties.
+Efficiency:
+	- Grid points are needed to resolve gradients in the flow solution.
+	- Grid clustering is needed for resolving velocity gradients across boundary layers, flow near an airfoil leading edge, and shock waves
+	- Don't waste grid density in aeras with little to no change (i.e. farfield)
+Uniformity:
+	- minimize abrupt increase/decrease in local grid spacing; large jumps in cell spacing can lead to instability and convergence issues
+Orthogonality:
+	- minimize "skewness" of your cells; a quad should be as close to rectangular (90 deg internal angles) as possible; drawing a line between 2 adjacent cell centers should have the line be 
+	  perpendicular to cell faces; this is an ideal case, you won't always be able to achieve this
+	  - there are CFD solvers specifically
+	- min/max included angles are a way to measure skewness
+	- this is related to interpolation and extrapolation used in typical CFD solvers
+
+Structured grids:
+	- O-grids are very efficient; capture wake poorly
+	- C-grids capture wake better; easier to combine with surrounding airfoils
+Unstructured grids are used for everything except perhaps academic problems:
+	- Multi-element unstructured grids have multiple types of elements (quads and tris)
+	- of course, can have 3D unstructured grids; near wall, use triangular prisms and hexahedrons (rect. prisms), transition to tetrahedra in the far field via pyramid shapes
+
+Q: "how do i know that i have enough grid resolution?"
+A: you don't know, unless you do a "grid sensitivity/resolution" study. 
+
+do this by doubling the resolution of the grid and check the difference in the solution; keep doubling until your solution doesn't change.
+if there is negligible sensitivity between the two (or more) highest levels of grid resolution, then your solution is "grid-independent".
+
+Grid adaptation will dynamically add resolution to your grid to try to capture features you didn't explicitly intend to capture (or they weren't where you expected them to be)
+
+Fluent will try to force a steady-state solution, even in a case where the flow
+is inherently unsteady (the wake behind an airfoil near stall); you can ask Fluent to give you the time-accurate 
+solution, it'll just take 10x longer.
+
+1/24/20 =======================================================================
+
+
+2/12/20
+Methods for linear convection equation
+- want to model wave propagation without dissipation or dispersion
+- forward and central differencing are unconditionally unstable; upwind/
+  backwards is conditionally stable, we HAVE to use it, our only option

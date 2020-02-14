@@ -1,0 +1,115 @@
+MULTIDIMENSIONAL DIFFERENTIATION / INTEGRATION ===============================
+
+Question on HW3: "extrapolation is necessary for some things but extraordinarily
+dangerous. do not extrapolate data outside the domain you're dealing with unless
+ABSOLUTELY necessary" --> set all values outside the domain to zero.
+
+Trapezoidal approximation is usually good enough. Can integrate an approximating
+nth-order polynomial, obtained by any method (Lagrange, etc.)
+
+Trapezoidal Rule:
+f_i+1/2 is average value of f between x_i and x_i+1, linearly interpolated at 
+the midpoint. The trapezoidal area under the approximating function is 
+equivalent to the rectangular area under the approximating function, at the 
+approximating function's midpoint value. This second interpretation is useful 
+because this way of looking at the problem is applicable to higher-order 
+approximations.
+
+Multidimensional Trapezoidal Rule:
+A 2D integral is the volume under a surface. For 4 points (i,j; i+1,j; etc.), 
+the trapezoidal rule becomes the average of the function at those four points. 
+A 3D trapezoidal rule becomes the average of the 8 points in a cubic lattice 
+surrounding a central point.
+
+You can treat multidimensional integrals as a series of one-dimensional 
+integrals (a fundamental theorem). For trapezoidal rule, the results are 
+identical, but for higher-order approximations (Simpson's rule, etc.), the 
+results may be slightly different.
+
+Simpson's Rule:
+- Approximating polynomial is quadratic, need 3 points
+
+Adaptive methods for integration exist. As you refine your interval, linear and
+quadratic approximations converge (see the definition of an integral). Does not
+always hold true for differential equations.
+
+Romberg (Raumberg)? iteration
+Gaussian quadrature
+
+FINITE DIFFERENCE (FD) TECHNIQUES FOR SOLVING ODEs ===========================
+
+(book notes exact solutions with a bar over the variable)
+
+Initial Value Problem (IVP): a temporal problem; has dy/dt
+Boundary Value Problem (BVP): a spatial problem; has dy/dx, d2y/dx2
+
+When solving ODEs by various methods, mostly doing numerical differentiation and
+integration.
+
+Euler methods (EM) are based on first-order derivative approximations
+- Backward difference method --> backward Euler method (BEM) (most stable method
+  existing; not super accurate, but very very very stable), also known as 
+  Implicit Euler Method
+- Forward difference method --> forward Euler method (FEM), also known as 
+  Explicit Euler Method. Forward EM can be much faster than backward EM, but is
+  not unconditionally stable. Target equation can be nonlinear, but complicates
+  things a bit. (doesn't matter if t^2 is in target equation, only y^2)
+
+For IVPs, solving finite difference equation (FDE) gives "update formula":
+formula that tells you how to get from timestep n to timestep n+1
+
+FEM requires estimation of function at next timestep, which is fine for linear 
+functions, but predicting nonlinear function values becomes difficult.
+
+Types of grids:
+- Spatial, x indexed by i
+- Temporal, t indexed by n (index notation is convention)
+
+Two types of instability, physical and numerical. A few systems are physically 
+unstable (exp(+at)), but numerical solutions can exhibit instability where the
+physical system is in fact stable.
+
+Backwards methods are unconditionally stable, but are much more expensive to 
+implement. There is good reason to use forward methods, even if they may be 
+unstable in some cases.
+
+PROPERTIES OF FDEs (FINITE DIFFERENCE EQUAITONS) =============================
+
+0) explicit (fwd) vs. implicit (bwd). for fwd methods, update depends on 
+   current timestep only. update for bwd methods depend on current and next 
+   timestep (which is what makes it unconditionally stable)
+1) order (local error vs. global error). methods are usually referred to by 
+   their global error
+2) consistency (FDE -> exact ODE being modeled as ∆t in FDE -> 0)
+3) stability (FDE produces a bounded solution, if one exists)
+4) convergence (consistent and stable)
+
+Implicit nonlinear problems modeled with a backward method will likely require 
+root-finding approaches to solve (Newton's method). This solving must be done 
+at each timestep, which is what makes the backward method so expensive to 
+implement.
+
+Nonlinear functions can be said to be "linearly stable", which means that the 
+nonlinear function is linearized, and that linearized function is stable. As 
+long as the linearity is not abused, an algorithm working with the linearly 
+linearized function will produce a stable result.
+
+Taylor series expansion exercise reveals both the order of the algorithm, and 
+whether it's consistent or not.
+
+STABILITY OF LINEAR EULER METHODS ============================================
+
+y_n+1 = G y_n -> y_N = G^N y_0 (G multiplied by itself for every iteration of
+n); solution is bounded if |G| ≤ 1
+
+for bwd Euler:
+
+        1
+G = -----------
+     (1 + α∆t)
+
+stability is determined by the characteristic time scale (α) and choice of ∆t
+
+for fwd Euler:
+
+G = 1 - α∆t            G ≤ 1 ✔  for all physical values of α,∆t  

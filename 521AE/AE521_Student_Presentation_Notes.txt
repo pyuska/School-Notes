@@ -1,0 +1,10 @@
+Things to avoid:
+- massive blocks of equation text
+- slides with no graphics; put lots of text in notes at end
+- insufficient font size (18-20 minimum)
+
+Things to include:
+- roadmap of where we are, where we've been, especially when working with large
+  equations
+- why we're doing what we're doing in this step of the derivation
+- 

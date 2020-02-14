@@ -1,0 +1,187 @@
+\documentclass[12pt,letterpaper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage[left=0.75in,right=0.75in,top=0.75in,bottom=0.75in]{geometry}
+\author{Paul Yuska}
+\title{EP 501 Final exam}
+\begin{document}
+
+\maketitle
+
+This is a take-home exam (work ALL problems) to be turned in 48 hours from the time it is posted (see canvas due date), unless you have notified me of a medical issue, family emergency, or other extenuating circumstance.  Unexcused late exams will not be graded.  
+
+I will also be checking my email regularly over the next 48 hours to answer questions.  If you do not understand a question, please ask for a clarification.  
+
+You MAY NOT work in groups or discuss details of the solution to these or similar problems with other students or faculty.  You also MAY NOT use online ``work this problem for me'' resources (i.e. you must complete this problem without direct assistance of another human being).  You ARE ALLOWED to use internet references, your notes, textbooks, and other resources such as physics books, differential equations books, integral tables, the TI-89, or mathematical software like Mathematica, Matlab, Maple, and similar.  
+
+Include citations, where appropriate, to results that you use for your solutions (e.g. ``Jackson eqn. 3.70'' ``Wolfram website'' ``Maple software'' and so on) and make sure that your work is completely described by your solution (i.e. it adequately developed and explained).   Please start a new page for each problem.  You must submit your solution via CANVAS as a .zip file with Matlab codes and Word, Pages, or \LaTeX text.
+
+The first two problems are intended to have written solutions and the third problem is intended to have a Matlab script solution.  However, you may take any approach you watn to any of these problems.  Please submit all codes that you generate for this exam.  
+
+
+\emph{You must sign (below) and attach this page to the front of your solution when you submit your solutions for this exam}.  Electronic signatures are acceptable and encouraged.  If you are typing up your solution in \LaTeX, please note that the source code for this document is included in the course repository.  \\
+\\
+\\
+
+
+\emph{I, PAUL YUSKA, confirm that I did not discuss the solution to these problems with anyone else.}
+
+\pagebreak
+\begin{enumerate}
+\item \textbf{Problem 1}
+\begin{itemize}
+\item[\textbf{1a.}] \textit{Given the following FDA, derive an update formula.}
+\label{update}
+\begin{equation}
+\frac{f^{n+1} - f^n}{\Delta t} = -\alpha\left(\frac{2}{3}f^n + \frac{1}{3}f^{n+1}	\right)\;,
+\end{equation}
+\textit{Solution:}\\
+\begin{eqnarray*}
+f^{n+1} - f^n &=& -\alpha \Delta t\frac{2}{3}f^n - \alpha \Delta t\frac{1}{3}f^{n+1}\\
+f^{n+1}\left(1+\frac{1}{3}\alpha\Delta t \right) &=& f^{n+1}\left(1-\frac{2}{3}\alpha\Delta t \right)\\
+f^{n+1} &=& \frac{1-\frac{2}{3}\alpha\Delta t}{1+\frac{1}{3}\alpha\Delta t}f^n
+\end{eqnarray*}
+\item[\textbf{1b.}] \textit{Determine the conditions for stability.}\\
+\textit{Solution:}\\
+From Section 7.6.2 in \cite{hoffman}, the stability analysis is initiated by writing the update formula in the following format:
+\begin{equation}
+f^{n+1} = Gf^n
+\end{equation}
+From 1a.,
+\begin{equation}
+G = \frac{1-\frac{2}{3}\alpha\Delta t}{1+\frac{1}{3}\alpha\Delta t}
+\end{equation}
+For stability over arbitrarily timespans (i.e., stability is independent of the timespan of the simulation), $|G|\leq 1$. It is given that $\alpha > 0$. With regards to the timestep, $\Delta t \leq 0$ is either non-physical or non-useful for our analysis. Thus, $\Delta t > 0$, and the product $\alpha \Delta t > 0$. By inspection, $G<1$ for all values of $\alpha \Delta t$, so the method is unconditionally stable.
+\item[\textbf{1c.}] \textit{Determine whether the method is consistent.}\\
+\textit{Solution:}\\
+The approximate value of $f$ at the next timestep, $f^{n+1}$, is given by the solution to \textbf{1a}. $f^{n+1}$ can also be expressed as a Taylor series about timestep $n$, as follows:
+\begin{equation}
+f^{n+1} = f^n + \Delta t[f']_n + \frac{1}{2}\Delta t^2 [f'']_n + \cdots\;,
+\end{equation}
+where $[f^{(k)}]_n$ represents the $k$th derivative of $f$. Equating the two gives:
+\begin{equation}
+f^{n+1} = \frac{1-\frac{2}{3}\alpha\Delta t}{1+\frac{1}{3}\alpha\Delta t}f^n = f^n + \Delta t[f']_n + \frac{1}{2}\Delta t^2 [f'']_n + \cdots\
+\end{equation}
+Rearranging to solve for $[f']_n$ gives:
+\begin{equation}
+[f']_n = \frac{1}{\Delta t}\left\lbrace f^n\left[\frac{1-\frac{2}{3}\alpha\Delta t}{1+\frac{1}{3}\alpha\Delta t} - 1 \right] - \frac{1}{2}\Delta t^2 [f'']_n + \cdots \right\rbrace
+\end{equation}
+Before any limit behavior can be analyzed, the $f^n$ term must be simplified.
+\begin{eqnarray*}
+\frac{1-\frac{2}{3}\alpha\Delta t}{1+\frac{1}{3}\alpha\Delta t} &-&  1\\
+\frac{1-\frac{2}{3}\alpha\Delta t}{1+\frac{1}{3}\alpha\Delta t} &-& \frac{1+\frac{1}{3}\alpha\Delta t}{1+\frac{1}{3}\alpha\Delta t}\\
+&-&\frac{\alpha \Delta t}{1+\frac{1}{3}\alpha\Delta t}
+\end{eqnarray*}
+The expression for $[f']_n$ is then:
+\begin{equation}
+\label{taylor}
+[f']_n = -f^n\left(\frac{\alpha}{1+\frac{1}{3}\alpha\Delta t}\right) - \frac{1}{2}\Delta t [f'']_n + \cdots
+\end{equation}
+Now, as $\Delta t \rightarrow 0$, the resulting equation is identical to the analytical ODE we started with, and so the method is consistent.
+\begin{equation}
+f' = -\alpha f
+\end{equation}
+\item[\textbf{1d.}] \textit{Determine the order of accuracy of this method.}\\
+\textit{Solution:}\\
+The Taylor series expansion in \textbf{1c} gives both consistency and order of accuracy of the method. The lowest-order $\Delta t$ term in (\ref{taylor}) is $\Delta t^1$, and so the method is first-order accurate (in time).
+\end{itemize}
+\item \textbf{Problem 2}
+There are three types of PDEs: elliptic, parabolic, and hyperbolic. The nomenclature comes from the form of the general second-order constant-coefficient PDE equation:
+\begin{equation*}
+Af_{xx} + Bf_{xy} + Cf_{yy} + Df_x + Ef_y + Ff = G
+\end{equation*}
+The form is very similar to that of a general conic section, and the discriminant of the conic section equation that determines whether the resulting curve is an ellipse, parabola, or hyperbola, $B^2 - 4AC$, serves the same purpose here: classifying PDEs into groups that possess certain characteristics. If $B^2 - 4AC < 0$, the PDE is elliptic; if $B^2 - 4AC = 0$, the PDE is parabolic; and if $B^2 - 4AC > 0$, the PDE is hyperbolic.\\
+\\
+Elliptic PDEs model equilibrium problems, like heat diffusion in a solid. Parabolic PDEs model propagation phenomena, such as acoustic or electromagnetic waves propagating through a medium. Hyperbolic PDEs model diffusive phenomena which is also a propagation problem; however, waves characterized by parabolic PDEs do not deform with time, while sharp peaks in functions represented by hyperbolic PDEs will tend to shorten and spread out over time.\\
+\\
+Two conditionally stable methods for solving hyperbolic equations are Lax-Wendroff and Godunov's Method. L-W tends to diffuse due to the numerical diffusion term added to mitigate small-scale instabilities that grow with time. Godunov's method is only first-order accurate in space and time.\\
+\\
+Explicit methods for solving PDEs rely only on currently-known data, i.e. information at the current timestep or before. They result in a simple update formula for the next timestep at a point. Update formulas for implicit methods depend on the value of the function at the next timestep, and so result in a system of equations that must be solved for each timestep.\\
+\\
+Upwinding is used to prevent the flow of information in the wrong direction, where it would not physically propagate. When a FDA is used, it only includes terms ``upwind'', i.e. indices or grid points that the information has already propagated to.\\
+\\
+I can answer all of these and answer them well. I didn't leave myself enough time.
+
+\item \textbf{Problem 3}
+\begin{itemize}
+\item[\textbf{3a.}] \textit{Derive an explicit time update formula for the advection-diffusion equation.}\\
+\textit{Solution:}\\
+The three partial derivatives are replaced by FDAs as follows:
+\begin{eqnarray}
+\label{a}
+\frac{\partial f}{\partial t} &\approx & \frac{f_i^{n+1} - f_i^n}{\Delta t}\\
+\frac{\partial f}{\partial x} &\approx & \frac{f_i^n - f_{i-1}^n}{\Delta x}\\
+\frac{\partial ^2 f}{\partial x^2} &\approx & \frac{f^n_{i+1} - 2f_i^n + f_{i-1}^n}{\Delta x^2}
+\label{c}
+\end{eqnarray}
+Substituting (\ref{a})-(\ref{c}) into the advection-diffusion equation gives
+\begin{equation*}
+\frac{f_i^{n+1} - f_i^n}{\Delta t} + v \frac{f_i^n - f_{i-1}^n}{\Delta x} - \lambda \frac{f^n_{i+1} - 2f_i^n + f_{i-1}^n}{\Delta x^2} = 0\;,
+\end{equation*}
+which can be rearranged to get
+\begin{equation}
+f_i^{n+1} = \frac{\lambda \Delta t}{\Delta x^2} \left( f^n_{i+1} - 2f_i^n + f_{i-1}^n \right) - \frac{v \Delta t}{\Delta x} \left( f_i^n - f_{i-1}^n \right) + f_i^n\;.
+\end{equation}
+\item[\textbf{3d.}] \textit{Modify the explicit method and derive a system of equations to make it semi-implicit.}\\
+\textit{Solution:}\\
+The diffusive term is now represented by
+\begin{equation}
+\frac{\partial ^2f}{\partial x^2} = \frac{f_{i+1}^{n+1} - 2f_{i}^{n+1} + f_{i-1}^{n+1}}{\Delta x^2}\;.
+\end{equation}
+Substituting into the advection-diffusion equation and rearranging gives the implicit update formula:
+\begin{equation}
+-\frac{\lambda}{\Delta x^2}\left( f_{i+1}^{n+1} + f_{i-1}^{n+1}\right) + \left(\frac{1}{\Delta t} + \frac{2\lambda}{\Delta x^2} \right)f_{i}^{n+1} = \left(\frac{v}{\Delta x} - \frac{1}{\Delta t} \right)f_i^n - \frac{v}{\Delta x}f_{i-1}^n
+\end{equation}
+This implicit formula creates a system of equations that must be solved at each time step. The system in matrix form is given by:
+
+\begin{gather}
+\begin{bmatrix}
+\alpha & \beta &   & &  & & &  0 \\
+\beta & \alpha & \beta &  & & & & \\
+ & \beta & \alpha & \beta  & &  & & \\
+ \\
+ & & & & \ddots & & & \\
+ \\
+& & & & & \beta& \alpha& \beta\\
+0 & & & & & & \beta& \alpha
+\end{bmatrix}
+\begin{bmatrix}
+f_1\\
+f_2\\
+f_3\\
+\\
+\vdots \\
+\\
+f_{N-1}\\
+f_{N}
+\end{bmatrix}
+=
+\begin{bmatrix}
+\gamma f_1^n - \delta f_{0}^n\\
+\gamma f_2^n - \delta f_{1}^n\\
+\gamma f_3^n - \delta f_{2}^n\\
+\\
+\vdots \\
+\\
+\gamma f_{N-1}^n - \delta f_{N-2}^n\\
+\gamma f_N^n - \delta f_{N-1}^n\\
+\end{bmatrix}
+\end{gather}
+where blank elements are zero, and $\alpha$, $\beta$, $\gamma$, and $\delta$ are given by
+\begin{eqnarray*}
+\alpha &=& \frac{1}{\Delta t} + \frac{2\lambda}{\Delta x^2}\\
+\beta &=& -\frac{\lambda}{\Delta x^2}\\
+\gamma &=& \frac{v}{\Delta x} - \frac{1}{\Delta t}\\
+\delta &=& \frac{v}{\Delta x}\;,
+\end{eqnarray*}
+$N$ is the number of grid points for each timestep, and $f_0^n$ represents the value of a ghost cell, whose value is set to zero.
+\end{itemize}
+\end{enumerate}
+\begin{thebibliography}{9}
+\bibitem{hoffman}
+Hoffman, Joe D. \textit{Numerical Methods for Engineers and Scientists}. Boca Raton, CRC Press, 2001.
+\end{thebibliography}
+\end{document}

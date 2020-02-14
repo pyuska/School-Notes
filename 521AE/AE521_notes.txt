@@ -1,0 +1,10 @@
+Exam next tuesday
+
+- cartesian navier-stokes equations
+- poiseuille flow
+- hemendez flow?
+- closed notes/book
+- 20% of grade
+- 1 hour
+- have to solve both the math and the physics; usually split the credit between
+  the math and the physics

@@ -1,0 +1,153 @@
+Finite Differences
+
+Unicode:
+- triple prime (U+2034): ‴
+- almost equal to (U+2248): ≈
+
+Taylor Series expansion
+1) f(x + ∆x) = f(x_0) + ∆x f'(x_0) + ∆x/2! f"(x_0) + ∆x/3! f‴(x_0) + ...
+2) f(x - ∆x) = f(x_0) - ∆x f'(x_0) + ∆x/2! f"(x_0) - ∆x/3! f‴(x_0) + ... (odd 
+   terms are negative)
+
+Eqn. 1 - Eqn. 2 is the first derivative and is called the "centered difference"
+formula.
+
+            f(x_0+∆x) - f(x_0-∆x)
+f'(x_0) = ------------------------- + O[(∆x)^2] ,
+                    2∆x
+
+where O(∆x^2) is 'some term' that goes as the square of ∆x. called the 
+"truncation error". the order of the bigO term determines the accuracy. called 
+"first-order accurate" or "second-order accurate".
+
+Eqn. 1 + Eqn. 2 is the second derivative and is again called the "centered 
+difference" formula
+
+            f(x_0+∆x) - 2f(x_0) + f(x_0-∆x)
+f'(x_0) = ----------------------------------- + O[(∆x)^2]
+                        (∆x)^2
+
+for some point x_0, with bounding points x_0 + ∆x and x_0 - ∆x, the first 
+derivative only uses the bracketing points, while the second derivative uses 
+all three points:
+
+        x_0 - ∆x       x_0      x_0 + ∆x
+ ...  ----> • --------> • --------> • ----> ...
+            √           x           √       f'(x_0)
+            √           √           √       f"(x_0)
+
+You can rearrange Eqns. 1 and 2 to get first-order estimates of f'(x_0):
+
+            f(x_0 + ∆x) - f(x_0)
+f'(x_0) = ------------------------- + O(∆x)         [Forward Difference]
+                     ∆x
+
+             f(x_0) - f(x_0 - ∆x)
+f'(x_0) = ------------------------- + O(∆x)         [Backward Difference]
+                     ∆x
+
+Backward Difference formula can be used to create unconditionally stable 
+solutions to ODEs. Still have to worry about accuracy though.
+
+"stiff eqns." (initial value problems) timescale required for maintaining 
+stability is much smaller than the timescale needed for accuracy (need to have 
+microsecond timestep to remain stable but only need millisecond timestep to 
+get accuracy required from simulation). backward difference very useful here.
+
+We are trying to find derivatives (first, second, etc.) when using Taylor 
+series; we know the value of the function at all points.
+
+Find third derivative:
+
+f(i+2) = f(i) + 2∆x f'(i) + 4∆x^2 f"(i)/2! + 8∆x^3 f‴(i)/3! + O[(∆x)^4]
+
+f(i+1) = f(i) + ∆x f'(i) + ∆x^2 f"(i)/2! + ∆x^3 f‴(i)/3! + O[(∆x)^4]
+
+f(i-1) = f(i) - ∆x f'(i) + ∆x^2 f"(i)/2! - ∆x^3 f‴(i)/3! + O[(∆x)^4]
+
+The only true constraint is that you need n equations to solve an nth 
+derivative.
+
+Can use Taylor series derivative approximation to derive a first-order 
+derivative, and then insert that into the formula for a second order derivative
+to find the second derivative. (can iteratively find higher-order derivatives.)
+The issue with this is that you don't have a great estimate on error.
+
+However, this isn't an issue with 1D, 2D problems with today's computers. You 
+can just throw more resolution at the problem and your machine can brute force 
+good accuracy. 3D problems with high resolution is a problem though; it might 
+take weeks to run a high-resolution 3D code on a computing cluster. Really does
+not scale well.
+
+
+Iterative differencing of another form (when A is not constant; commonly seen 
+in solutions to the heat equation):
+
+                 A df/dx)_i+1/2 - A df/dx)_i-1/2
+d/dx(A df/dx) ≈ ----------------------------------
+                                ∆x
+
+            [A_i+1/2 (f_i+1 - f_i)/∆x] - [A_i-1/2 (f_i - f_i-1)/∆x]
+        = ------------------------------------------------------------
+                                      ∆x
+
+where A_i+1/2 is the (probably linearly) interpolated value of A:
+A_i+1/2 = (A_i + A_i+1)/2
+
+
+Partial Derivatives ======================================================
+
+f(x,y) -> f_ij (some function sampled onto a grid)
+If you need second-order accuracy, use centered difference
+
+ df  |           f_i+1,j - f_i-1,j
+---- |    = --------------------------
+ dx  |i,j                2∆x
+
+ df  |           f_i,j+1 - f_i,j-1
+---- |    = --------------------------
+ dy  |i,j                2∆y
+
+
+When parallelizing (domain decomposition -> split domain into different chunks,
+hand off to different processing), have to pass a lot of messages back and 
+forth because the data required to calculate edge cases is not in memory 
+(handled by another process)
+
+When dealing with 3D problems, have to decide whether time spent computing 
+high-accuracy (greater than second-order) solutions would be better spent doing
+first or second-order accuracy solutions on a higher-resolution grid.
+
+When using centered difference for a finite grid, can't use centered difference
+for data points on the edges of the grid. Most common approach is to use forward
+and backward difference (first-order approximations, less accurate). Called 
+"degrading the derivative" or "degrading the accuracy". A less common approach 
+is to go back to Taylor series and derive a second-order accurate forward and 
+backward difference to use at the edges to preserve second-order accuracy across
+the entire domain. Usually the boundary conditions aren't SO important that this
+is necessary; usually the stuff in the middle of the domain is more interesting.
+
+Another approach is to include "ghost cells" or "guard cells" (VERY common with
+finite volume methods, mostly used in CFD) at the edges of the domain to allow 
+the centered difference formula to apply to all of the domain without 
+modification. These cells are usually filled with extrapolated data, which tends
+to reduce the accuracy of the edges to first-order anyways. Allows for open 
+boundary conditions (water flowing through a control volume intersecting a 
+section of pipe, for example).
+
+When writing own finite difference code, very common to have non-uniformly sized
+grid cells (cell size as a function of location in the domain). Just make sure 
+to take this into account when implementing ∆x in finite diff. equations.
+
+People put "sponge layers" or "Rayleigh friction (?) layers" at the edges of 
+domains to absorb reflected waves which are artifacts of the simulation.
+
+When doing wave simulations, first order approximations of derivatives give 
+significant phase errors for sparsely-sampled grids. The phase error declines to
+zero as the grid resolution goes to inf.
+
+MIDTERM notes:
+- covers everything up to and including derivatives
+- open book (electronic or otherwise)
+- can use MATLAB if desired
+- no internet use

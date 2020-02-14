@@ -1,0 +1,52 @@
+\documentclass[10pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\title{EP501 Numerical Methods Notes}
+\begin{document}
+\maketitle
+
+\section{PDEs}
+General 2nd order PDE in 2 variables (usually x and t):
+
+\begin{equation}
+A(f_{xx}) + B(f_{xy}) + C(f_{yy}) + D(f_x) + E(f_y) + F(f) = G\;,f(x,t)
+\end{equation}
+
+Types of PDEs:
+\begin{itemize}
+\item[-] elliptic (steady-state, BVPs)
+\item[-] parabolic (diffusing systems)
+\item[-] hyperbolic (wave solutions, describe propagation with time)
+\end{itemize}
+- 
+
+Can classify by B^2 - 4AC, where A,B,C are coefficients from general eqn. above
+
+  B^2 - 4AC         type
+-------------   ------------
+    < 0           elliptic
+    = 0          parabolic
+    > 0          hyperbolic
+
+Crossed partial derivatives (B term above) are not that common.
+
+Examples of these types:
+- heat equation (parabolic)
+- wave equation (hyperbolic)
+    - can be represented by the 'advective equation', which is a wave equation in a different form
+
+Stability for PDEs is even more important than for ODEs. There are some algorithms for some problems that are unconditionally unstable (can use von Neumann analysis to derive linear stability criterion and prove to yourself).
+
+PDEs in space are usually 2nd-order accurate. PDEs in time have varying accuracy:
+- fwd Euler O(∆t): for PDEs, also called FTCS (forward time, centered space) O(∆t + ∆x^2)
+- bwd Euler O(∆t): for PDEs, also called BTCS, O(∆t + ∆x^2)
+- trapezoidal rule/method O(∆x^2 + ∆t^2): also called 'Crank-Nicolson', technically CTCS
+
+FTCS is just an update formula, easy to generate and all terms are known before solving. BTCS is a system of equations, there are terms that depend on the as-yet uncalculated values of the function at the next grid point and time step. Have to solve system of equations, so requires more work to solve, but is unconditionally stable. CTCS is by far the most popular method; it's 2nd-order accurate in both time and space and easy to compute.
+
+Often want to use finite-volume methods for hyperbolic equations; INCREDIBLY popular in CFD implementations
+
+For CTCS, knowns are values at timestep n, unknowns are values at timestep n+1. When creating the system of equations, the previous and next steps in space are usually symmetric/identical, unless you have some funky non-uniform grid spacing or other variation in a field or something.
+\end{document}

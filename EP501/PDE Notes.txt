@@ -1,0 +1,294 @@
+PDE notes
+
+Abbreviations:
+FTCS: forward-time, centered-space
+BTCS: backward-time, centered space
+CTCS: centered-time, centered-space
+
+Notation:
+Subscripts and superscripts given by f_[subscripts], f^[superscripts] and can
+be combined: f_[sub]^[sup]. Spacing is always given to distinguish sub-/
+superscripts from math terms in an equation.
+
+General 2nd order PDE in 2 variables (usually x and t)
+
+A(f_xx) + B(f_xy) + C(f_yy) + D(f_x) + E(f_y) + F(f) = G
+
+Types of PDEs:
+- elliptic (steady-state, BVPs)
+- parabolic (diffusing systems)
+- hyperbolic (wave solutions, describe propagation with time)
+
+Can classify by B^2 - 4AC, where A,B,C are coefficients from general eqn. above
+
+  B^2 - 4AC         type
+-------------   ------------
+    < 0           elliptic
+    = 0          parabolic
+    > 0          hyperbolic
+
+Crossed partial derivatives (B term above) are not that common.
+
+Examples of these types:
+- heat equation (parabolic)
+- wave equation (hyperbolic)
+    - can be represented by the 'advection equation', which is a wave equation
+      in a different form (1st order PDE?)
+
+Stability for PDEs is even more important than for ODEs. There are some 
+algorithms for some problems that are unconditionally unstable (can use
+von Neumann analysis to derive linear stability criterion and prove to 
+yourself).
+
+PDEs in space are usually 2nd-order accurate. PDEs in time have varying
+accuracy:
+- fwd Euler O(∆t): for PDEs, also called FTCS (forward time, centered 
+  space) O(∆t + ∆x^2)
+- bwd Euler O(∆t): for PDEs, also called BTCS, O(∆t + ∆x^2)
+- trapezoidal rule/method O(∆x^2 + ∆t^2): also called 'Crank-Nicolson', 
+  technically CTCS
+
+FTCS is just an update formula, easy to generate and all terms are known before
+solving. BTCS is a system of equations, there are terms that depend on the 
+as-yet uncalculated values of the function at the next grid point and time step.
+Have to solve system of equations, so requires more work to solve, but is 
+unconditionally stable. CTCS is by far the most popular method; it's 2nd-order 
+accurate in both time and space and easy to compute.
+
+Often want to use finite-volume methods for hyperbolic equations; INCREDIBLY 
+popular in CFD implementations.
+
+For CTCS, knowns are values at timestep n, unknowns are values at timestep n+1. 
+When creating the system of equations, the previous and next steps in space are
+usually symmetric/identical, unless you have some funky non-uniform grid 
+spacing or other variation in a field or something.
+
+In practice, parabolic equations are usually quite stiff. It's more important 
+that the algorithm is stable and produces results without numerical artifacts; 
+2nd-order stability is secondary. Trapezoidal rule is widely used; an 
+improvement on it is the trapezoidal rule with an additional backward 
+difference algorithm (called TR-BDF2). TR-BDF2 is about twice as expensive to 
+implement, but has been shown to perform better than the trapezoidal method 
+for certain nonlinear problems stability-wise; technically has identical 
+accuracy to trapezoidal method.
+
+Stability analysis of PDEs is usually conducted under 2 assumptions:
+- linearity (linearize nonlinear eqns)
+- periodicity (assume features that leave the right side of the domain 
+  re-enter the left side of the domain; allows for Fourier expansion into 
+  infinite sums of periodic function, which is INCREDIBLY useful)
+
+Periodicity permits the implementation of Fourier exponential series, which is
+useful for characterizing solutions that grow and decay in time.
+
+          ∞
+T(x) =    ∑   T_tilde * e^(i*k_m*x)
+       m = -∞
+
+       for (0 ≤ x ≤ a), k_m = 2πm/a, i = √-1
+
+Usually sufficient to consider a single Fourier mode e^(i*k_m*x) and study 
+growth of solutions.
+
+FTCS: del T/del x - lambda(del^2 T)/(del x)^2 = 0
+
+(Note: lambda is in heat equation, but is assumed = 1 for this derivation)
+
+T_j^n+1 = t_j^n + ∆t/∆x^2 (T_j^n+1 - 2T_j^n + T_j-1^n)
+
+Convert ("drill"?) into the form
+
+T_j^n+1 = g(k_m) T_j^n, where abs[g(k_m)] ≤ 1, g(k_m) is the "gain factor"
+
+Write T_j, T_j+1, T_j-1 terms as approx equal to e^(i*k_m*x),
+    where x = x_0 ± ∆x for j±1 terms
+
+Expand (see Dr. Z's notes), and find the conditions where abs[g(k_m)] ≤ 1; 
+this turns out to be lambda∆t/∆x^2 ≤ 1/2; this is the stability criterion for 
+FTCS. FTCS is conditionally stable, but this stability criterion is very 
+restrictive; if you want ∆x to be small, it places a serious restriction on 
+the maximum value of ∆t. This becomes important for finer grids.
+
+Generally, grid size for explicit algorithms always affects time step.
+
+When coding numerical solutions, define your stability criterion and then base
+a timescale based on that to guarantee numerical stability.
+
+HW4:
+when integrating the mag. field around a circle, should get 10 amps
+should get 5.4 x 10^9 J
+
+W_E for part 2a. Does appear to be converging on an answer, just not the 
+correct one.
+pts     ans
+25      4.70e13
+50      4.33e10
+75      1.44e13
+100     8.75e10
+125     8.19e12
+200     1.76e11
+300     2.64e11
+
+should get sinusoids for 2c.
+
+What is causing the instability in the Ch10.m file? limitation of machine 
+accuracy of representation of numbers. numerical truncation (inability to 
+represent numbers exactly) is a source of noise, which grows exponentially over
+time and will eventually ruin your solution.
+
+Numerical instability for hyperbolic equations:
+- FTCS is unconditionally UNSTABLE, but can be modified by adding numerical 
+  diffusion to kill off the unstable modes and make it stable
+- leapfrog method produces low-quality results, waves can disperse over time 
+  (even if the wave physically does not)
+- implicit methods (BTCS) suffers the same issues as leapfrog
+
+- Explicit algorithms
+  - Upwind algorithms (great for capturing shocks/discontinuities)
+  - Lax-Wendroff (add dispersion)
+
+HW5:
+- solution to 1 should not be a straight line (classmate claims that the 
+  solution, as is, is definitely a straight line)
+- 1e: MATLAB '\' operator (mldivide)
+- 2c already done in ch.7 matlab code in repo; 1 km/s initial velocity in each
+  direction
+
+Courant-Friedrichs-Lewy (CFL) Number
+
+CFL = v dt/dx; CFL should be ≤ 1 for stability of explicit methods. For shock 
+capturing schemes, want to be very close to 1 (resolve sharper features), but 
+otherwise, getting close to 1 is "living dangerously".
+
+When modeling hyperbolic equations, it is very common to enforce periodic 
+boundary conditions. As the wave propagates out of the domain (to the right, 
+for example), it is "injected" back into the domain on the left side. This way,
+the wave can be observed over a much longer period of time. Analytically, this
+isn't interesting, because the wave should be identical in shape for all time.
+Numerically, the wave may disperse or diffuse, so this is a convenient way to 
+diagnose this incongruity.
+
+Hyperbolic solvers often implement "ghost" or "guard" (older term) cells so 
+that centered difference can be used everywhere in the domain. The downside is
+that you have to enforce conditions on these boundary cells. Some common 
+boundary conditions are:
+- periodic
+- reflecting walls
+- free flow / freestream
+- matching layers (harder to implement; can be done for linear, "hopeless" for
+  nonlinear)
+  - impedance match of wave on boundary and wave in interior so wave passes 
+    through perfectly without reflection
+
+Second order methods require 2 ghost cells per edge instead of 1. Consider a 
+domain containing 10 cells with indices i = 1,...,10, 2 ghost cells to the 
+left of i=1, and 2 ghost cells to the right of i=10. When The 2 ghost cells on
+the right are set equal to cells 1 and 2, and the 2 ghost cells on the left are
+set equal to cells 9 and 10, a ring-like geometry is created. The addition of 
+ghost cells on both sides allows information to propagate in both directions.
+
+Parabolic unstable growth is "explosive" and immediately apparent. Hyperbolic 
+unstable growth is a little more "graceful" (occurs over longer timescales), 
+so you have to be careful that you let your solution run for long enough to let
+this instability to present itself, if it exists.
+
+FTCS implementations of hyperbolic equations always grow exponentially due to 
+growth of small-scale modes over time. This can be counteracted by including:
+  - artificial viscosity
+    - viscosity in fluid flows tends to smooth out small-scale features, which
+      is a good thing in this case; the small-scale features are what end up 
+      growing exponentially
+      - Lax-Friedrichs, Lax-Wendroff are of this type
+      - can calculate what this artificial viscosity should be to perfectly 
+	stabilize the solution
+    - upwinding (Godunov methods)
+      - when introduced in 1950s, was revolutionary; changed how CFD was done 
+	and what could be done with CFD
+      - basis for most finite volume methods
+
+These upwinding methods seem like they're pulled out of thin air; that's 
+because they are, to an extent. Someone had a brain wave, proposed a method, 
+and proved that it was stable and consistent (it converged to the real solution).
+
+Lax-Friedrichs (L-F) Method:
+L-F adds an artificial viscosity term that's an average of the two grid cells 
+(i,i+1). Not used in practice today, but is the basis for commonly used 
+methods. Tends to kill off sharp peaks over short timescales, which is not 
+always desirable; L-F on structures with sharp peaks almost resembles parabolic
+equations (diffusion). Over long timescales, the artificial viscosity destroys 
+all structures (solutions exhibit exponential decay). This is why L-F is not 
+used in practice. The main benefit of L-F is that it is used to derive Lax-
+Wendroff.
+
+FTCS:   f_i^n+1 = f_i^n - v∆t/2∆x(...)
+L-F:    f_i^n+1 = (f_i-1^n + f_i+1^n)/2 - v∆t/2∆x(...)
+
+Lax-Wendroff (L-W) Method:
+L-W uses L-F to form a half-step update to achieve 2nd order accuracy in time 
+(already 2nd order accurate in space). Note the loss of the 2 in the 
+denominator of the ∆t/∆x term from the L-F method (but it IS present in the 
+interface formulas). If your timestep is too small, L-W will produce artificial
+dispersion on the trailing edge of a wave. Should calculate your timestep from 
+your CFL number and smaller is not always better.
+
+L-W:    f_i^n+1 = f_i^n - v∆t/∆x(f_i+1/2^n+1/2 - f_i-1/2^n+1/2) ,
+
+where half-step updates (called interfaces) are:
+f_i-1/2^n+1/2 = (f_i^n + f_i-1^n)/2 - v∆t/2∆x(f_i^n - f_i-1^n)
+f_i+1/2^n+1/2 = (f_i^n + f_i-1^n)/2 - v∆t/2∆x(f_i+1^n - f_i^n)
+
+This is called the Two-Step L-W method; can implement L-W in a single formula,
+but obscures the origins of things (accuracy?)
+
+Upwinding (Godunov's Method) eliminates instabilities in hyperbolic solutions
+by preventing information transfer in the direction antiparallel to the 
+characteristic velocity of the wave being simulated. Information is only 
+allowed to propagate upstream. The downside is that it is only 1st-order 
+accurate in space and time. However, people have made modifications to 
+Godunov's method that approach 2nd-order accuracy in space and time. An 
+important property of upwinding methods is that they accurately model the wave 
+propagation speed.
+
+f_i^n+1 = f_i^n - v∆t/∆x(f_i - f_i-1),  (v > 0)
+f_i^n+1 = f_i^n - v∆t/∆x(f_i+1 - f_i),  (v < 0)
+
+For ODEs, higher order solutions have more restrictive stability limits. This 
+likely translates to PDEs as well.
+
+High-resolution methods require two ghost cells per side of grid instead of one.
+
+BTCS is still unconditionally stable for hyperbolic equations, but doesn't 
+perform well and violates the idea that information should only propagate 
+downstream. Still have a system of differential equations to solve for each 
+grid point.
+
+Numerical diffusion is the tendency for algorithms to "spread out" sharp peaks 
+over time. Reducing the timestep increases numerical diffusion.
+
+Numerical dispersion is the tendency for features to distort as they propagate.
+
+Sharp features/discontinuities very commonly create artifacts. Have to use 
+upwinding; but upwinding is very diffusive, and doesn't retain the properties 
+of the initial sharp feature.
+
+If you see grid-level oscillations, that is almost always an artifact of having
+a very sharp feature that you are trying to propagate with a method that is 
+ill-fitted to that type of feature.
+
+"Order of accuracy isn't everything" for PDEs
+
+All hyperbolic methods discussed in this class have issues accurately 
+representing sharp boundaries. Finite-volume flux-limiting methods are used to 
+solve this problem. Called Total-Variation-Diminishing (TVD) schemes.
+
+BOOK RECOMMENDATIONS
+
+- Finite Difference Methods by Randall LeVeque (best continuation of class)
+- Finite Volume Methods by Randall LeVeque (focused solely on hyperbolic 
+  methods, heavy reading)
+- Numerical Methods for Fluid Dynamics by ?
+- Numerical Electromagnetics: The FDTD Method by Robert Marshall (purely 
+  electromagnetic waves, not applicable to fluid flows)
+- Computational Physics by David Potter (missing operator splitting (was 
+  written before those methods were developed), but covers much of the same 
+  material covered in class)

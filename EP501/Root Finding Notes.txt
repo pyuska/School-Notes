@@ -1,0 +1,76 @@
+LINEAR ROOT-FINDING %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Fixed point iteration:
+set f(x) = 0 -> x = g(x)
+x(i+1) = g(x)
+
+convergence condition:
+e(i+1) = g'(x(i))e(i)
+
+NONLINEAR ROOT-FINDING %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Newton-Rhapson method is open domain.
+
+approximate the Taylor series at x(i):
+f(x) approx= f(x(i)) + f'(x(i))(x-x(i)) + H.O.T. (truncate)
+
+rearrange to get finite difference formula:
+                 f(x) - f(x(i))
+f'(x(i)) approx= --------------
+                    x - x(i)
+
+In terms of an iteration formula, this becomes
+           f(x(i+1)) + f(x(i))
+f'(x(i)) = -------------------
+              x(i+1) - x(i)
+solve for x(i+1), force f(x(i+1))=0, gives exact Newton's method:
+                 f(x(i))
+x(i+1) = x(i) - ---------
+                f'(x(i))
+
+Exact Newton's method required exact knowledge of the derivative. If this is not possible, there is an approximate Newton's method that uses a modified finite difference formula
+                 f(x(i)+ε) - f(x(i))
+f'(x(i)) approx= -------------------
+                          ε
+where ε is a small displacement. Performance depends on quality of choice of ε: if ε is too small, round-off errors occur, and if ε is too big, convergence is slowed.
+
+Can define error 2 ways:
+e = x - α (book does it this way)
+e = α - x
+
+Newton's method has quadratic convergence. Newton's method boasts fastest convergence.
+Newton's method is also ABSOLUTELY CONVERGENT. It always converges (unless your root is complex, and you gave a real initial guess; see note below).
+
+There are some improvements that can be made to Newton's method, which are called Muller's method. The difference lies in using quadratic or higher polynomials to find the next iteration guess, instead of a line.
+
+For Secant method, need to store an extra point (i and i-1) to compute i+1. For Muller's method, need i-2 as well.
+
+Given x(i), x(i-1), x(i-2),
+
+g(x) = a(x-x(i))^2 + b(x-x(i)) + c
+
+need 3 equations (3 unknowns a,b,c)
+1:  f(x(i)) = c
+2:  f(x(i-1)) = a(x(i-1)-x(i))^2 + b(x(i-1)-x(i)) + c
+3:  f(x(i-2)) = a(x(i-2)-x(i))^2 + b(x(i-2)-x(i)) + c
+
+then,
+                        2c (NOT 2a as in standard quadratic formula!)
+x(i+1) = x(i) - -------------------
+                b ± sqrt(b^2 - 4ac)
+
+choose root closest to x(i); choose ± to be the same sign as b.
+
+Newton's, Secant, and Muller's methods are open domain methods; don't need to specify domains of guesses or roots.
+
+Choice of initial guesses usually comes from physical intuition or results of previous guesses, etc. But if you're handed an arbitrary polynomial, it's basically trial and error to find something that works.
+
+If you try Newton's method on a polynomial that has complex conjugate roots, it will never converge if you give it a real guess. Give it a complex guess (a + bi) and it should converge.
+
+If you run Newton's method with wildly different inputs and get the same root, check for root multiplicity. Factor out the root multiplicity and try again.
+
+Times you would use something other than Newton's method:
+- you have something very close to quadratic
+- you have a function where it's very difficult to compute a derivative
+
+(what is an error surface?) from sidenote on optimization
